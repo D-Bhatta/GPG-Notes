@@ -1,0 +1,24 @@
+mkdir temp_directory;
+gpg --homedir temp_directory --list-secret-keys --keyid-format=long;
+gpg --homedir temp_directory --quick-generate-key "Name <email>" ed25519 cert 11m;
+gpg --homedir temp_directory --list-secret-keys --keyid-format=long;
+
+gpg --homedir temp_directory --quick-add-key full_keyid ed25519 sign 1m;
+gpg --homedir temp_directory --quick-add-key full_keyid cv25519 encrypt 1m;
+gpg --homedir temp_directory --quick-add-key full_keyid ed25519 auth 1m;
+gpg --homedir temp_directory --output GPG-revoke-small_keyid.asc --gen-revoke small_keyid;
+gpg --homedir temp_directory --yes --output public-small_keyid.gpg --export small_keyid;
+gpg --homedir temp_directory --yes --output private-small_keyid.gpg --export-secret-key small_keyid;
+gpg --homedir temp_directory --yes --output private-subkeys-small_keyid.gpg --export-secret-subkeys;
+gpg --homedir temp_directory --export-ownertrust;
+mkdir subkeys_modified;
+gpg --homedir temp_directory --expert --edit-key small_keyid;
+
+passwd
+save
+
+gpg --homedir temp_directory --yes --output subkeys_modified/private-subkeys-small_keyid.gpg --export-secret-subkeys;
+gpg --list-secret-keys --keyid-format=long;
+gpg --import subkeys_modified/private-subkeys-small_keyid.gpg;
+gpg --import-ownertrust otrust.txt;
+gpg --list-secret-keys --keyid-format=long;

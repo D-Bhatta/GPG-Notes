@@ -1,0 +1,18 @@
+mkdir gnupg_temp;
+gpg --homedir gnupg_temp --list-secret-keys --keyid-format=long;
+gpg --homedir gnupg_temp --import private-small_keyid.gpg;
+gpg --homedir gnupg_temp --list-secret-keys --keyid-format=long;
+gpg --homedir gnupg_temp --quick-add-key full_keyid ed25519 sign 1m;
+gpg --homedir gnupg_temp --quick-add-key full_keyid cv25519 encrypt 1m;
+gpg --homedir gnupg_temp --quick-add-key full_keyid ed25519 auth 1m;
+gpg --homedir gnupg_temp --list-secret-keys --keyid-format=long;
+gpg --homedir gnupg_temp --yes --output public-small_keyid.gpg --export small_keyid;
+gpg --homedir gnupg_temp --yes --output private-small_keyid.gpg --export-secret-key small_keyid;
+gpg --homedir gnupg_temp --yes --output private-subkeys-small_keyid.gpg --export-secret-subkeys;
+mkdir subkeys_modified;
+gpg --homedir gnupg_temp --expert --edit-key small_keyid;
+
+gpg --homedir gnupg_temp --output subkeys_modified/private-subkeys-small_keyid.gpg --export-secret-subkeys;
+gpg --list-secret-keys --keyid-format=long;
+gpg --import subkeys_modified/private-subkeys-small_keyid.gpg;
+gpg --list-secret-keys --keyid-format=long;
